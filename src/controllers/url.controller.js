@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { deleteUrlByIdAndCreatorId, getUrlByShortUrl, insertUrl, updateUrlVisitCount } from "../repositories/urls.repository.js";
+import { deleteUrlByIdAndCreatorId, getUrl, getUrlByShortUrl, insertUrl, updateUrlVisitCount } from "../repositories/urls.repository.js";
 
 export async function createUrl(req, res) {
     const { url } = req.body;
@@ -18,7 +18,7 @@ export async function createUrl(req, res) {
     }
 }
 
-export async function getUrl(req, res) {
+export async function getUrlById(req, res) {
     const { id } = req.params;
 
     try {
