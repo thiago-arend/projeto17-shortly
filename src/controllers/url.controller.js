@@ -1,16 +1,14 @@
-import { db } from "../database/database.connection.js";
 import { nanoid } from 'nanoid';
+import { deleteUrlByIdAndCreatorId, getUrlByShortUrl, insertUrl, updateUrlVisitCount } from "../repositories/urls.repository.js";
 
 export async function createUrl(req, res) {
     const { url } = req.body;
-    const { session } = res.locals;
+    const { userId } = res.locals.session;
 
     try {
 
         const shortUrl = nanoid(6);
-        const result = await db.query(`
-            INSERT INTO urls (url, "shortUrl", "creatorId") VALUES ($1, $2, $3) RETURNING id;`,
-            [url, shortUrl, session.userId]);
+        const result = await insertUrl(url, shortUrl, userId);
 
         res.status(201).send({ id: result.rows[0].id, shortUrl });
     } catch (err) {
@@ -25,7 +23,7 @@ export async function getUrl(req, res) {
 
     try {
 
-        const result = await db.query(`SELECT * FROM urls WHERE id=$1`, [id]);
+        const result = await getUrl(id);
         if (result.rowCount === 0) return res.status(404).send({ message: "Url não encontrada!" });
 
         const url = result.rows[0];
@@ -44,11 +42,10 @@ export async function visitUrl(req, res) {
 
     try {
 
-        const result = await db.query(`SELECT * FROM urls WHERE "shortUrl"=$1;`, [shortUrl]);
+        const result = await getUrlByShortUrl(shortUrl);
         if (result.rowCount === 0) return res.status(404).send({ message: "Url encurtada não encontrada!" });
 
-        await db.query(`UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1;`,
-            [result.rows[0].id]);
+        await updateUrlVisitCount(result.rows[0].id);
 
         res.redirect(`${process.env.BASE_URL}/${shortUrl}`);
     } catch (err) {
@@ -63,11 +60,10 @@ export async function deleteUrl(req, res) {
 
     try {
 
-        const result = await db.query(`SELECT * FROM urls WHERE id=$1;`, [id]);
+        const result = await getUrl(id);
         if (result.rowCount === 0) return res.status(404).send({ message: "Url não encontrada!" });
 
-        const resultDelete = await db.query(`DELETE FROM urls WHERE id=$1 AND "creatorId"=$2;`,
-            [id, userId]);
+        const resultDelete = await deleteUrlByIdAndCreatorId(id, userId);
             if (resultDelete.rowCount === 0) 
                 return res.status(401).send({ message: "A url encurtada não pertence ao usuário!" });
 

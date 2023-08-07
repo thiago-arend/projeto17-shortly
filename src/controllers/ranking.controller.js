@@ -1,14 +1,10 @@
-import { db } from "../database/database.connection.js";
+import { getUsersRanking } from "../repositories/users.repository.js";
 
 export async function getRanking(req, res) {
 
     try {
 
-        const result = await db.query(
-            `SELECT users.id, users.name, COUNT(urls.id) AS "linksCount", COALESCE(SUM(urls."visitCount"), 0) AS "visitCount"
-                FROM users LEFT JOIN urls ON urls."creatorId"=users.id
-                GROUP BY users.id ORDER BY "visitCount" DESC LIMIT 10;`
-        );
+        const result = await getUsersRanking();
 
         res.status(200).send(result.rows);
     } catch (err) {
