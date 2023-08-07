@@ -1,8 +1,5 @@
 import { nanoid } from 'nanoid';
 import { deleteUrlByIdAndCreatorId, getUrl, getUrlByShortUrl, insertUrl, updateUrlVisitCount } from "../repositories/urls.repository.js";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export async function createUrl(req, res) {
     const { url } = req.body;
@@ -50,7 +47,7 @@ export async function visitUrl(req, res) {
 
         await updateUrlVisitCount(result.rows[0].id);
 
-        res.redirect(`${process.env.BASE_URL}/${shortUrl}`);
+        res.redirect(result.rows[0].url);
     } catch (err) {
 
         res.status(500).send(err.message);
