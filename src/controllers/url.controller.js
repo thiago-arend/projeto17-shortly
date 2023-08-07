@@ -51,7 +51,7 @@ export async function visitUrl(req, res) {
         await db.query(`INSERT INTO visits ("urlId") VALUES ($1);`,
             [result.rows[0].id]);
 
-        res.redirect(`localhost:5000/${shortUrl}`);
+        res.redirect(`${process.env.BASE_URL}/${shortUrl}`);
     } catch (err) {
 
         res.status(500).send(err.message);
