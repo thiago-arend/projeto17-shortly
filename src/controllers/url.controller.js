@@ -1,5 +1,8 @@
 import { nanoid } from 'nanoid';
 import { deleteUrlByIdAndCreatorId, getUrl, getUrlByShortUrl, insertUrl, updateUrlVisitCount } from "../repositories/urls.repository.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export async function createUrl(req, res) {
     const { url } = req.body;
