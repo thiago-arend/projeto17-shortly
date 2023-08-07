@@ -47,7 +47,8 @@ export async function visitUrl(req, res) {
         const result = await db.query(`SELECT * FROM urls WHERE "shortUrl"=$1;`, [shortUrl]);
         if (result.rowCount === 0) return res.status(404).send({ message: "Url encurtada não encontrada!" });
 
-        await db.query(`UPDATE urls SET "visitCount"="visitCount"+1;`);
+        await db.query(`UPDATE urls SET "visitCount"="visitCount"+1 WHERE id=$1;`,
+            [result.rows[0].id]);
 
         res.redirect(`${process.env.BASE_URL}/${shortUrl}`);
     } catch (err) {
