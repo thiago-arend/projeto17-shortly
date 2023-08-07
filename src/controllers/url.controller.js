@@ -57,3 +57,22 @@ export async function visitUrl(req, res) {
         res.status(500).send(err.message);
     }
 }
+
+export async function deleteUrl(req, res) {
+    const { id } = req.params;
+
+    try {
+
+        const result = await db.query(`SELECT * FROM urls WHERE id=$1;`, [id]);
+        if (result.rowCount === 0) return res.status(404).send({ message: "Url não encontrada!" });
+
+        const resultDelete = await db.query(`DELETE FROM urls WHERE id=$1 AND "creatorId"=$2;`,
+            [id, result.rows[0].creatorId]);
+        console.log(resultDelete);
+
+        res.status(204).send(url);
+    } catch (err) {
+
+        res.status(500).send(err.message);
+    }
+}
