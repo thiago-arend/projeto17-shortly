@@ -47,9 +47,7 @@ export async function visitUrl(req, res) {
         const result = await db.query(`SELECT * FROM urls WHERE "shortUrl"=$1;`, [shortUrl]);
         if (result.rowCount === 0) return res.status(404).send({ message: "Url encurtada não encontrada!" });
 
-        // faria mais sentido salvar também o id de quem realizou a visita...
-        await db.query(`INSERT INTO visits ("urlId") VALUES ($1);`,
-            [result.rows[0].id]);
+        await db.query(`UPDATE urls SET "visitCount"="visitCount"+1;`);
 
         res.redirect(`${process.env.BASE_URL}/${shortUrl}`);
     } catch (err) {
@@ -60,6 +58,7 @@ export async function visitUrl(req, res) {
 
 export async function deleteUrl(req, res) {
     const { id } = req.params;
+    const { userId } = res.locals.session;
 
     try {
 
@@ -67,10 +66,11 @@ export async function deleteUrl(req, res) {
         if (result.rowCount === 0) return res.status(404).send({ message: "Url não encontrada!" });
 
         const resultDelete = await db.query(`DELETE FROM urls WHERE id=$1 AND "creatorId"=$2;`,
-            [id, result.rows[0].creatorId]);
-        console.log(resultDelete);
+            [id, userId]);
+            if (resultDelete.rowCount === 0) 
+                return res.status(401).send({ message: "A url encurtada não pertence ao usuário!" });
 
-        res.status(204).send(url);
+        res.sendStatus(204);
     } catch (err) {
 
         res.status(500).send(err.message);

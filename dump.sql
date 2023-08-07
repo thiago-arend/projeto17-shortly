@@ -61,7 +61,8 @@ CREATE TABLE public.urls (
     url text NOT NULL,
     "shortUrl" text NOT NULL,
     "creatorId" integer NOT NULL,
-    "createdAt" timestamp without time zone DEFAULT now()
+    "visitCount" integer DEFAULT 0 NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -119,37 +120,6 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: visits; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.visits (
-    id integer NOT NULL,
-    "urlId" integer NOT NULL,
-    "createdAt" timestamp without time zone DEFAULT now()
-);
-
-
---
--- Name: visits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.visits_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: visits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.visits_id_seq OWNED BY public.visits.id;
-
-
---
 -- Name: sessions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -171,13 +141,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Name: visits id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.visits ALTER COLUMN id SET DEFAULT nextval('public.visits_id_seq'::regclass);
-
-
---
 -- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -191,7 +154,6 @@ INSERT INTO public.sessions VALUES (4, '9999ab79-c6f4-4b10-bc97-8bb53dd59f81', 1
 -- Data for Name: urls; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.urls VALUES (1, 'https://www.geeksforgeeks.org/', 'VHOhpY', 1, '2023-08-05 22:27:59.257522');
 
 
 --
@@ -201,17 +163,6 @@ INSERT INTO public.urls VALUES (1, 'https://www.geeksforgeeks.org/', 'VHOhpY', 1
 INSERT INTO public.users VALUES (1, 'João', 'joao@driven.com.br', '$2b$10$D.vukJH5bwf999nMsRXUQOIMOb.5W55a1AGoz5Emd7yh5tk7YfLpa', '2023-08-05 15:51:15.994478');
 INSERT INTO public.users VALUES (8, 'Marina', 'marina@gmail.com', '$2b$10$Ka8leLzrRnJkx3kOOV.yXOn4u4nf2y9lDvOSMP/T5E5Ry1b9XSEMe', '2023-08-05 16:03:37.71635');
 INSERT INTO public.users VALUES (10, 'Marina', 'marinawi@gmail.com', '$2b$10$NUHXOnUdp7/uzHB/Bm.Pz.0M12yfcwHc9feGVSfVBnOk61jWskPt6', '2023-08-05 16:04:11.648581');
-
-
---
--- Data for Name: visits; Type: TABLE DATA; Schema: public; Owner: -
---
-
-INSERT INTO public.visits VALUES (45, 1, '2023-08-05 23:48:48.988989');
-INSERT INTO public.visits VALUES (46, 1, '2023-08-05 23:49:24.578592');
-INSERT INTO public.visits VALUES (47, 1, '2023-08-05 23:50:09.585195');
-INSERT INTO public.visits VALUES (48, 1, '2023-08-05 23:51:30.813916');
-INSERT INTO public.visits VALUES (49, 1, '2023-08-05 23:51:32.320423');
 
 
 --
@@ -225,7 +176,7 @@ SELECT pg_catalog.setval('public.sessions_id_seq', 4, true);
 -- Name: urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.urls_id_seq', 1, true);
+SELECT pg_catalog.setval('public.urls_id_seq', 1, false);
 
 
 --
@@ -233,13 +184,6 @@ SELECT pg_catalog.setval('public.urls_id_seq', 1, true);
 --
 
 SELECT pg_catalog.setval('public.users_id_seq', 10, true);
-
-
---
--- Name: visits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.visits_id_seq', 49, true);
 
 
 --
@@ -291,14 +235,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: visits visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.visits
-    ADD CONSTRAINT visits_pkey PRIMARY KEY (id);
-
-
---
 -- Name: sessions sessions_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -312,14 +248,6 @@ ALTER TABLE ONLY public.sessions
 
 ALTER TABLE ONLY public.urls
     ADD CONSTRAINT "urls_creatorId_fkey" FOREIGN KEY ("creatorId") REFERENCES public.users(id);
-
-
---
--- Name: visits visits_urlId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.visits
-    ADD CONSTRAINT "visits_urlId_fkey" FOREIGN KEY ("urlId") REFERENCES public.urls(id);
 
 
 --
